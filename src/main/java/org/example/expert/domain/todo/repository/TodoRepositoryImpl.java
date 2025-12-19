@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.expert.domain.todo.entity.QTodo;
 import org.example.expert.domain.todo.entity.Todo;
 import org.example.expert.domain.user.entity.QUser;
+import org.springframework.stereotype.Repository;
 
+@Repository
 @RequiredArgsConstructor
 public class TodoRepositoryImpl implements TodoCustomRepository{
     private final JPAQueryFactory queryFactory;

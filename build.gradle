@@ -24,8 +24,14 @@ repositories {
 }
 
 dependencies {
+    //Spring security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // OpenfeignQueryDsl. 기존 QueryDsl의 보안취약점이 보완된 버전
     implementation 'io.github.openfeign.querydsl:querydsl-core:6.12'
     implementation 'io.github.openfeign.querydsl:querydsl-jpa:6.12'
+
     annotationProcessor 'io.github.openfeign.querydsl:querydsl-apt:6.12:jpa'
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
