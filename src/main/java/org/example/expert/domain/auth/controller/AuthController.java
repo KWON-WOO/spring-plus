@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.SQLException;
+
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
@@ -25,5 +27,10 @@ public class AuthController {
     @PostMapping("/auth/signin")
     public SigninResponse signin(@Valid @RequestBody SigninRequest signinRequest) {
         return authService.signin(signinRequest);
+    }
+
+    @PostMapping("/auth/bulk")
+    public void testBulkInsert() throws SQLException {
+        authService.testBulk();
     }
 }

@@ -1,6 +1,8 @@
 package org.example.expert.domain.auth.service;
 
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.expert.config.JwtUtil;
 import org.example.expert.config.PasswordEncoder;
 import org.example.expert.domain.auth.dto.request.SigninRequest;
@@ -15,6 +17,11 @@ import org.example.expert.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -23,6 +30,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final HikariDataSource dataSource;
 
     @Transactional
     public SignupResponse signup(SignupRequest signupRequest) {
@@ -60,5 +68,55 @@ public class AuthService {
         String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getNickname(), user.getUserRole());
 
         return new SigninResponse(bearerToken);
+    }
+
+    public void testBulk() throws SQLException {
+
+        int total = 5_000_000;
+        int batchSize = 20_000;
+
+        long startTime = System.currentTimeMillis();
+        long stopTime;
+        long tempTime = System.currentTimeMillis();
+        long totalTime;
+
+        dataSource.setUsername("test");
+        dataSource.setPassword("");
+        String sql = "INSERT INTO users(email,nickname,password,user_role,created_at,modified_at) VALUES(?,?,?,?,?,?)";
+        Connection connection = dataSource.getConnection();
+        connection.setAutoCommit(false);
+        PreparedStatement statement = connection.prepareStatement(sql);
+
+        for (int i = 0; i < total; i++) {
+            String email = "a" + i + "@gmail.com";
+            String nickname = UUID.randomUUID() + "_" + i;
+            String password = "Aasdfzxcv" + i;
+
+            statement.setString(1, email);
+            statement.setString(2, nickname);
+            statement.setString(3, password);
+            statement.setString(4, UserRole.USER.toString());
+            statement.setString(5, LocalDateTime.now().toString());
+            statement.setString(6, LocalDateTime.now().toString());
+            statement.addBatch();
+            if (i % batchSize == (batchSize - 1)) {
+                statement.executeBatch();
+                connection.commit();
+                statement.clearBatch();
+
+                stopTime = System.currentTimeMillis();
+                tempTime = stopTime - tempTime;
+                totalTime = stopTime - startTime;
+                log.info("{}번째 완료\t걸린 시간 : {}ms\t 총 시간 : {}ms", i + 1, tempTime, totalTime);
+                tempTime = stopTime;
+            }
+        }
+        statement.executeBatch();
+        connection.commit();
+        Statement select = connection.createStatement();
+        ResultSet res = select.executeQuery("SELECT COUNT(*) FROM users");
+
+        if (res.next())
+            log.info("등록된 유저 수 : {}", res.getInt(1));
     }
 }
