@@ -10,3 +10,6 @@
 ## S3 업로드 및 삭제
 <img width="2562" height="1170" alt="image" src="https://github.com/user-attachments/assets/bacf10a9-2d20-4aa2-844c-ba430166ed70" />
 <img width="884" height="866" alt="image" src="https://github.com/user-attachments/assets/2230190a-0880-4034-867a-94720193d7d3" />
+
+## 쿼리 성능 최적화
+https://www.notion.so/61-2ce392f9072f80bfacede4b94e56203c?source=copy_link
